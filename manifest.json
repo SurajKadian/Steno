@@ -13,11 +13,33 @@
     ],
     "background_color": "#f9f9f9",
     "theme_color": "#112D4E",
-        "icons": [
-          { "src": "/img/favicon.ico", "type": "image/x-icon", "sizes": "16x16 32x32" },
-          { "src": "/img/icon-192.png", "type": "image/png", "sizes": "192x192" },
-          { "src": "/img/icon-512.png", "type": "image/png", "sizes": "512x512" },
-          { "src": "/img/icon-192-maskable.png", "type": "image/png", "sizes": "192x192", "purpose": "maskable" },
-          { "src": "/img/icon-512-maskable.png", "type": "image/png", "sizes": "512x512", "purpose": "maskable" }
-        ]
+    "icons": [
+        {
+            "src": "img/favicon.ico",
+            "type": "image/x-icon",
+            "sizes": "16x16 32x32"
+        },
+        {
+            "src": "img/icon-192.png",
+            "type": "image/png",
+            "sizes": "192x192"
+        },
+        {
+            "src": "img/icon-512.png",
+            "type": "image/png",
+            "sizes": "512x512"
+        },
+        {
+            "src": "img/icon-192-maskable.png",
+            "type": "image/png",
+            "sizes": "192x192",
+            "purpose": "maskable"
+        },
+        {
+            "src": "img/icon-512-maskable.png",
+            "type": "image/png",
+            "sizes": "512x512",
+            "purpose": "maskable"
+        }
+    ]
 }

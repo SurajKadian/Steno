@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shorthand Test</title>
+    <meta name="theme-color" content="#112D4E">
+    <meta name="description"
+        content="Free steno / shorthand test website for SSC steno skill test or any other government exam's shorthand skill test, with effective error calculation and layout similar to that of SSC">
+    <meta name="keywords"
+        content="@SurajKadian,steno, SSC Steno, Stenographer, free shorthand software, typing speed, typing accuracy, free online typing test, typing practice, SSC typing, SSC exam, SSC layout, Government exam, skill test, steno, steno software, typing software">
+    <link rel="stylesheet" href="style.css">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="img/logo.svg">
+
+    <link rel="stylesheet" href="style.css">
+
+    <!-- Google tag (gtag.js) -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-Z8YMBKEQY6"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
+
+        gtag('config', 'G-Z8YMBKEQY6');
+    </script>
+    <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Suraj Kadian",
+    "url": "https://www.surajkadian.github.io/Steno/",
+    "logo": "https://www.surajkadian.github.io/Steno/img/icon.png",
+    "sameAs": [
+      "https://www.t.me/surajkadian/",
+      "https://github.com/SurajKadian"
+    ]
+  }
+  </script>
+</head>
+
+<body>
+    <!-- Top Bar -->
+    <header>
+        <div id="heading">Shorthand Practice</div>
+        <div id="timer">00:00</div>
+    </header>
+
+    <!-- Dictation Options -->
+    <div class="container" id="options-screen">
+        <h2>Select a Dictation</h2>
+        <div class="options">
+            <div class="card-btn" data-audio="audio/d01.mp3" data-text="text/KC/KC001.txt">Demo Dictation</div>
+            <!-- KC Group -->
+            <div class="group-card">
+                <div class="group-toggle">Kailash Chandra</div>
+                <div class="group-list">
+                    <div class="card-btn" data-audio="audio/KC/KC001.mp3" data-text="text/KC/KC001.txt">Dictation 1
+                    </div>
+                    <div class="card-btn" data-audio="audio/KC/KC002.mp3" data-text="text/KC/KC001.txt">Dictation 2
+                    </div>
+                    <div class="card-btn" data-audio="audio/KC/KC003.mp3" data-text="text/KC/KC001.txt">Dictation 3
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pro Group -->
+            <div class="group-card">
+                <div class="group-toggle">Progressive</div>
+                <div class="group-list">
+                    <div class="card-btn">soon...</div>
+                </div>
+            </div>
+            <div class="group-card">
+                <div class="group-toggle">GD Bhist</div>
+                <div class="group-list">
+                    <div class="card-btn">soon...</div>
+                </div>
+            </div>
+            <div class="group-card">
+                <div class="group-toggle">Previous Year</div>
+                <div class="group-list">
+                    <div class="card-btn">soon...</div>
+                </div>
+            </div>
+        </div>
+        <div class="custom-option">
+            <div class="card-btn custom-btn" data-audio="custom">+ Custom Dictation</div>
+        </div>
+    </div>
+
+    <div class="audio-screen" id="audio-screen" style="display:none;">
+        <div style="text-align:center; margin-top:50px;">
+            <h2 id="audio-title">Playing Dictation...</h2>
+            <p id="audio-time">00:00 / 00:00</p>
+            <div style="background:#ddd; height:8px; width:60%; margin:15px auto; border-radius:4px;">
+                <div id="audio-progress"
+                    style="background:var(--accent-color); height:100%; width:0%; border-radius:4px;"></div>
+            </div>
+        </div>
+        <button id="skip-dictation" class="submit-btn">Skip Dictation</button>
+    </div>
+
+
+    <!-- Workspace (Reading + Transcription Stage) -->
+    <div class="workspace" id="workspace">
+        <div class="textarea-box">
+            <textarea id="transcription" placeholder="Type your transcription here..." spellcheck="false"
+                autocorrect="off" autocapitalize="off"></textarea>
+            <textarea id="text1" style="display:none;"></textarea>
+        </div>
+        <div class="actions">
+            <button class="submit-btn" id="submit-btn">Submit</button>
+        </div>
+    </div>
+
+    <!-- Results Screen -->
+    <div id="output-div" class="output-div" style="display: none;">
+        <div id="result"></div>
+        <div class="checkbox-controls">
+            <div class="checkbox-controls p-cards">
+                <label><input type="checkbox" class="round-checkbox" id="considerAllPunctuation" checked>All
+                    Punctuation</label>
+                <label><input type="checkbox" class="round-checkbox" id="considerComma">Comma</label>
+                <label><input type="checkbox" class="round-checkbox" id="considerPeriod" checked> Full Stop</label>
+            </div>
+            <div class="checkbox-controls p-cards capital-div">
+                <label><input type="checkbox" class="round-checkbox" id="considerCase" checked> Capitalisation</label>
+            </div>
+            <div class="checkbox-controls p-cards download-pdf-div"><button id="download-pdf" class="icons"
+                    onclick="window.print()" alt="Download Results Button">
+                    <img src="img/DL.svg" class="svg" width="18" height="18"><span>Save Results</span></button>
+            </div>
+        </div>
+        <div id="output" class="output"></div>
+    </div>
+    <div id="popup" class="popup-overlay" style="display:none;">
+        <div class="popup-content">
+            <h2 id="popup-title">Instructions</h2>
+            <div id="popup-body">
+                <p>You will choose a dictation. After the dictation audio finishes, you will have <strong>10
+                        minutes</strong> to read. Then <strong>50 minutes</strong> will be given for transcription.</p>
+            </div>
+            <div class="popup-actions">
+                <button id="popup-close">Close</button>
+                <button id="popup-ok">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script>if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function () {
+                navigator.serviceWorker.register('js/service-worker.js');
+            });
+        }
+    </script>
+    <script src="js/script.js"></script>
+    <script src="js/service-worker.js"></script>
+</body>
+
+</html>

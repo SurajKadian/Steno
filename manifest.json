@@ -1,0 +1,23 @@
+{
+    "name": "Steno",
+    "short_name": "Steno",
+    "description": "Shorthand practice app for SSC steno skill tests or any other government exams steno skill test, with similar layout and some added functionalities",
+    "start_url": "https://surajkadian.github.io/Steno/",
+    "display": "standalone",
+    "splash_screen": [
+        {
+            "src": "img/logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ],
+    "background_color": "#ffffff",
+    "theme_color": "#112D4E",
+    "icons": [
+        {
+            "src": "img/logo.svg",
+            "sizes": "any",
+            "type": "image/svg+xml"
+        }
+    ]
+}

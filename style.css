@@ -81,11 +81,14 @@ header {
     font-weight: 600;
 }
 
+.group-toggle:hover {
+    background: var(--hover-color);
+}
+
 .group-list {
     display: none;
     flex-direction: column;
     gap: 10px;
-    margin-left: 20px;
 }
 
 .options {
@@ -97,7 +100,7 @@ header {
 
 .card-btn {
     background: var(--card);
-    padding: 20px;
+    padding-inline: 20px;
     border-radius: 8px;
     text-align: center;
     font-size: 18px;
@@ -109,15 +112,31 @@ header {
     background: var(--hover-color);
 }
 
+h4 {
+    margin: 0;
+    padding: 0;
+}
+
+.dictation-meta {
+    font-size: 12px;
+    color: var(--text-color);
+    margin-top: 4px;
+}
+
 .custom-option {
     margin-top: 30px;
     display: flex;
     justify-content: center;
 }
 
+.custom-btn {
+    padding: 10px;
+    width: 100vw;
+    border: 1px solid var(--hover-color);
+}
+
 .custom-btn:hover {
-    background: #ffe9c7;
-    border-color: #e69900;
+    background: var(--hover-color);
 }
 
 .workspace {
@@ -173,7 +192,7 @@ textarea::-webkit-scrollbar-track {
     padding: 10px 20px;
 }
 
-button {
+button, .card-btn, .group-toggle {
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
     transition: background-color 0.3s;
@@ -191,7 +210,7 @@ button.submit-btn {
     border-radius: 6px;
 }
 
-button#up-btn{
+button#up-btn {
     margin-top: 10px;
     background: var(--hover-color);
     color: var(--text-color);

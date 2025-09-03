@@ -11,8 +11,8 @@
             "type": "image/svg+xml"
         }
     ],
-    "background_color": "#f9f9f9",
-    "theme_color": "#112D4E",
+    "background_color": "#e7ecef",
+    "theme_color": "#274c77",
     "icons": [
         {
             "src": "img/favicon.ico",

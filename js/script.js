@@ -4,6 +4,7 @@ var outputDiv = document.getElementById("output-div");
 var submit = document.getElementById("submit-btn");
 let submitButtonClicked = false;
 let autoClick = false;
+let copyPaste = false;
 var result = document.getElementById('result');
 var output = document.getElementById("output");
 const timer = document.getElementById('timer');
@@ -39,17 +40,20 @@ function showPopup(title, bodyHTML, onOk) {
     });
 }
 
-
 document.querySelectorAll(".group-toggle").forEach(toggle => {
-    toggle.addEventListener("click", () => {
-        /*const list = toggle.nextElementSibling;
-        const isVisible = list.style.display === "flex";
-        document.querySelectorAll(".group-list").forEach(gl => gl.style.display = "none");
-        list.style.display = isVisible ? "none" : "flex";*/
-        showPopup(
-            "These dictations will be available soon...",``,
-            () => {}
-        );
+    toggle.addEventListener("click", (e) => {
+        const el = e.currentTarget;
+        if (el.classList.contains("soon")) {
+            showPopup(
+                "These dictations will be available soon...", ``,
+                () => { }
+            );
+        } else {
+            const list = toggle.nextElementSibling;
+            const isVisible = list.style.display === "flex";
+            document.querySelectorAll(".group-list").forEach(gl => gl.style.display = "none");
+            list.style.display = isVisible ? "none" : "flex";
+        }
     });
 });
 
@@ -88,8 +92,8 @@ function startReadingStage() {
     readingScreen.style.alignItems = "center";
     readingScreen.style.height = "90vh";
     readingScreen.innerHTML = `
-      <h1 style="font-size:2rem; margin-bottom:20px;">10 Minutes for Reading</h1>
-      <div style="font-size:2rem;" id="reading-timer"></div>
+      <h1 style="font-size:2rem; margin:20px;">10 Minutes for Reading</h1>
+      <div style="font-size:2rem; margin-bottom:20px;" id="reading-timer"></div>
       <button id="skip-reading" class="submit-btn">Skip Reading</button>
     `;
     document.body.appendChild(readingScreen);
@@ -132,104 +136,132 @@ function startTranscriptionStage() {
 
 // Dictation buttons
 document.querySelectorAll(".card-btn").forEach(btn => {
-    btn.addEventListener("click", async () => {
-        const audioFile = btn.dataset.audio;
-        const textFile = btn.dataset.text;
-
-        if (audioFile !== "custom") {
-
+    btn.addEventListener("click", async (e) => {
+        const el = e.currentTarget;
+        if (el.classList.contains("soon")) {
             showPopup(
-                "Instructions",
-                `<p>Now the dictation audio will play </p>
-               <p>After the dictation finishes, you will get <strong>10 minutes</strong> to read your outlines.</p>
-               <p>Then you will get <strong>50 minutes</strong> to transcribe.</p>`,
-                () => {
-                    optionsScreen.style.display = "none";
-                    audio = new Audio(audioFile);
-                    document.getElementById("audio-screen").style.display = "block";
-                    document.getElementById("audio-title").textContent = "Playing: " + btn.textContent;
-
-                    audio.addEventListener("loadedmetadata", () => {
-                        const duration = audio.duration;
-                        const audioTime = document.getElementById("audio-time");
-                        const progressBar = document.getElementById("audio-progress");
-
-                        audio.play();
-
-                        const updateInterval = setInterval(() => {
-                            const current = audio.currentTime;
-                            audioTime.textContent = formatTime(Math.floor(current)) + " / " + formatTime(Math.floor(duration));
-                            progressBar.style.width = ((current / duration) * 100) + "%";
-
-                            if (audio.ended) {
-                                clearInterval(updateInterval);
-                                document.getElementById("audio-screen").style.display = "none";
-                                startReadingStage();
-                            }
-                        }, 500);
-                    });
-
-                    document.getElementById("skip-dictation").addEventListener("click", () => {
-                        audio.pause();
-                        document.getElementById("audio-screen").style.display = "none";
-                        startReadingStage();
-                    });
-                }
+                "These dictations will be available soon...", ``,
+                () => { }
             );
-
-            if (textFile) {
-                try {
-                    const response = await fetch(textFile);
-                    if (!response.ok) throw new Error("Failed to load " + textFile);
-                    text1.value = await response.text();
-                } catch (err) {
-                    console.error("Error fetching text:", err);
-                    text1 = "";
-                }
-            }
-
         } else {
-            showPopup(
-                "Custom Dictation",
-                `<p>Get your own dictation, and paste the original matter below which will be used to calculate errors. </p>
-                <textarea id="custom-text" placeholder="Paste or type master text here..." 
-                    style="width:100%; height:150px; margin-top:10px; padding:10px; border:1px solid #ccc; border-radius:6px;"></textarea>
-                 <br>
-                 <button id="up-btn" class="icons" alt="Upload Text File">Upload Text File
-                 <input type="file" id="custom-file" accept=".txt" style="display: none;">
-                 </button>`,
-                () => {
-                    const customText = document.getElementById("custom-text");
-                    if (typeof text1 !== "undefined") {
-                        text1.value = customText.value;
+            const audioFile = btn.dataset.audio;
+            const textFile = btn.dataset.text;
+
+            if (audioFile !== "custom") {
+
+                showPopup(
+                    "Instructions", `
+                <p>Now the dictation audio will play </p>
+                <p>After the dictation finishes, you will get <strong>10 minutes</strong> to read your outlines.</p>
+                <p>Then you will get <strong>50 minutes</strong> to transcribe.</p>
+                <p>Select speed for dictation (in <b>WPM</b>): </p>
+                <div class="speed-options">
+                <button class="speed-btn" data-speed="0.8">80</button>
+                <button class="speed-btn" data-speed="0.9">90</button>
+                <button class="speed-btn active" data-speed="1.0">100</button>
+                <button class="speed-btn" data-speed="1.1">110</button>
+                <button class="speed-btn" data-speed="1.2">120</button>
+                </div>`,
+                    () => {
+                        optionsScreen.style.display = "none";
+                        audio = new Audio(audioFile);
+                        document.getElementById("audio-screen").style.display = "block";
+                        document.getElementById("audio-title").textContent = "Playing: " + btn.textContent;
+
+                        audio.addEventListener("loadedmetadata", () => {
+                            const originalDuration = audio.duration;
+                            const effectiveDuration = originalDuration / selectedSpeed;
+
+                            const audioTime = document.getElementById("audio-time");
+                            const progressBar = document.getElementById("audio-progress");
+
+                            audio.playbackRate = selectedSpeed;
+                            audio.play();
+
+                            const updateInterval = setInterval(() => {
+                                const current = audio.currentTime / selectedSpeed;
+                                audioTime.textContent =
+                                    formatTime(Math.floor(current)) + " / " + formatTime(Math.floor(effectiveDuration));
+
+                                progressBar.style.width = ((current / effectiveDuration) * 100) + "%";
+
+                                if (audio.ended) {
+                                    clearInterval(updateInterval);
+                                    document.getElementById("audio-screen").style.display = "none";
+                                    startReadingStage();
+                                }
+                            }, 500);
+                        });
+
+                        document.getElementById("skip-dictation").addEventListener("click", () => {
+                            audio.pause();
+                            document.getElementById("audio-screen").style.display = "none";
+                            startReadingStage();
+                        });
                     }
-                    startReadingStage();
-                }
-            );
+                );
 
-            setTimeout(() => {
-                const fileInput = document.getElementById("custom-file");
-                const customText = document.getElementById("custom-text");
+                let selectedSpeed = 1.0;
 
-                document.getElementById('up-btn').addEventListener('click', function () {
-                    document.getElementById('custom-file').click();
+                document.querySelectorAll(".speed-btn").forEach(btn => {
+                    btn.addEventListener("click", () => {
+                        document.querySelectorAll(".speed-btn").forEach(b => b.classList.remove("active"));
+                        btn.classList.add("active");
+                        selectedSpeed = parseFloat(btn.dataset.speed);
+                    });
                 });
 
-                if (fileInput && customText) {
-                    fileInput.addEventListener('change', function (event) {
-                        const file = event.target.files[0];
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                const text = e.target.result;
-                                customText.value = text;
-                            };
-                            reader.readAsText(file);
-                        }
-                    });
+                if (textFile) {
+                    try {
+                        const response = await fetch(textFile);
+                        if (!response.ok) throw new Error("Failed to load " + textFile);
+                        text1.value = await response.text();
+                    } catch (err) {
+                        console.error("Error fetching text:", err);
+                        text1 = "";
+                    }
                 }
-            }, 0);
 
+            } else {
+                showPopup(
+                    "Custom Dictation",
+                    `<p>Get your own dictation, and paste the original matter below which will be used to calculate errors. </p>
+                    <textarea id="custom-text" placeholder="Paste or type master text here..." 
+                    style="width:100%; height:150px; padding:10px; border:1px solid var(--border-color); border-radius:6px; background: var(--background-color);"></textarea>
+                    <br>       
+                    <button id="up-btn" class="icons" onclick="document.getElementById('custom-file').click();">
+                    <img src="img/up.svg" class="svg" width="18" height="18"><span>Upload Text File</span>
+                    <input type="file" id="custom-file" accept=".txt" style="display: none;">
+                    </button>`,
+                    () => {
+                        const customText = document.getElementById("custom-text");
+                        if (typeof text1 !== "undefined") {
+                            text1.value = customText.value;
+                        }
+                        startReadingStage();
+                    }
+                );
+
+                setTimeout(() => {
+                    const fileInput = document.getElementById("custom-file");
+                    const customText = document.getElementById("custom-text");
+
+                    if (fileInput && customText) {
+                        fileInput.addEventListener('change', function (event) {
+                            const file = event.target.files[0];
+                            if (file) {
+                                const reader = new FileReader();
+                                reader.onload = function (e) {
+                                    const text = e.target.result;
+                                    customText.value = text;
+                                };
+                                reader.readAsText(file);
+                            }
+                        });
+                    }
+                }, 0);
+
+            }
         }
     });
 });
@@ -406,14 +438,18 @@ submit.addEventListener('click', function () {
     var blue = blueWords.length;
     var fm = red + orange;
     var error = errorsPercentage(fm, blue, wordCount1);
+    var cp = "Disabled";
 
     if (!submitButtonClicked && !autoClick) {
         timeTotal = timeTotal - timeLeft;
     }
 
-    if (wordCount2 > 1 && charCount2 > 1) {
+    if (wordCount2 > 1 && charCount2 > 1 && !copyPaste) {
         var wpm = Math.round(wordCount2 / (timeTotal / 60));
         var cpm = Math.round(charWord2 / (timeTotal / 60));
+    } else if (copyPaste) {
+        wpm = cpm = "NA";
+        cp = "Enabled";
     } else {
         wpm = cpm = "0"
     }
@@ -427,6 +463,7 @@ submit.addEventListener('click', function () {
             <div class="result-card"><span>Total Words:</span><strong>${wordCount1 + ' (' + charWord1 + ')'}</strong></div>
             <div class="result-card"><span>Words Typed:</span><strong>${wordCount2 + ' (' + charWord2 + ')'}</strong></div>
             <div class="result-card"><span>Time Taken:</span><strong>${Math.floor(timeTotal / 60)}:${(timeTotal % 60).toString().padStart(2, '0')}</strong></div>
+            <div class="result-card"><span>Copy-Paste:</span><strong>${cp}</strong></div>
             </div>`;
 
     // output
@@ -476,6 +513,7 @@ const disableCopyPasteHandler = e => {
             ["paste", "copy", "cut"].forEach(evt => {
                 text2.removeEventListener(evt, disableCopyPasteHandler);
             });
+            copyPaste = true;
             console.log("Copy/paste is now enabled!");
         }
     );

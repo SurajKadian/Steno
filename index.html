@@ -74,9 +74,14 @@
 
             <!-- Pro Group -->
             <div class="group-card">
-                <div class="group-toggle soon">Progressive</div>
+                <div class="group-toggle">Progressive</div>
                 <div class="group-list">
-                    <div class="card-btn">soon...</div>
+                    <div class="card-btn soon" data-audio="audio/KC/KC001.mp3" data-text="text/KC/KC001.txt">Dictation 1
+                    </div>
+                    <div class="card-btn soon" data-audio="audio/KC/KC002.mp3" data-text="text/KC/KC001.txt">Dictation 2
+                    </div>
+                    <div class="card-btn soon" data-audio="audio/KC/KC003.mp3" data-text="text/KC/KC001.txt">Dictation 3
+                    </div>
                 </div>
             </div>
             <div class="group-card">
@@ -133,7 +138,8 @@
                 <label><input type="checkbox" class="round-checkbox" id="considerCase" checked> Capitalisation</label>
             </div>
             <div class="checkbox-controls p-cards download-pdf-div">
-                <button id="download-pdf" class="icons output-btn" onclick="window.print()" alt="Download Results Button">
+                <button id="download-pdf" class="icons output-btn" onclick="window.print()"
+                    alt="Download Results Button">
                     <img src="img/DL.svg" class="svg" width="18" height="18"><span>Save Results</span></button>
                 <button id="restart" class="icons output-btn" onclick="location.reload()" alt="Restart Button">
                     <img src="img/rs.svg" class="svg" width="18" height="18"><span>Restart</span></button>
@@ -144,6 +150,7 @@
     <div id="popup" class="popup-overlay" style="display:none;">
         <div class="popup-content">
             <h2 id="popup-title">Instructions</h2>
+            <hr class="divider">
             <div id="popup-body">
                 <p>You will choose a dictation. After the dictation audio finishes, you will have <strong>10
                         minutes</strong> to read. Then <strong>50 minutes</strong> will be given for transcription.</p>

@@ -5,8 +5,8 @@
     --text-color: #2a2a29;
     --text-background: #fff;
     --background-color: #e7ecef;
-    --background-color2:#6096ba;
-    --card:#fff;
+    --background-color2: #6096ba;
+    --card: #fff;
     --accent-color: #274c77;
     --hover-color: #A3CEF1;
     --font-family: 'Open Sans', Arial, sans-serif;
@@ -94,6 +94,29 @@ header {
     display: none;
     flex-direction: column;
     gap: 10px;
+    transform-origin: top center;
+    animation: dropdown-bounce 0.2s ease forwards;
+}
+
+@keyframes dropdown-bounce {
+    0% {
+        transform: scaleY(0.2);
+        opacity: 0;
+    }
+
+    60% {
+        transform: scaleY(1.1);
+        opacity: 0.8;
+    }
+
+    80% {
+        transform: scaleY(0.94);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scaleY(1);
+    }
 }
 
 .options {
@@ -367,6 +390,7 @@ input[type="checkbox"].round-checkbox:checked {
     width: 90%;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     text-align: left;
+    animation: popup 0.3s ease;
 }
 
 .popup-content h2 {
@@ -374,6 +398,11 @@ input[type="checkbox"].round-checkbox:checked {
     font-size: 24px;
     color: var(--accent-color);
 }
+
+.divider {
+    border: 1px solid rgba(0,0,0,0.15);
+    margin: 6px 0 16px 0;
+  }
 
 .popup-actions {
     margin-top: 20px;
@@ -392,13 +421,18 @@ input[type="checkbox"].round-checkbox:checked {
 
 #popup-close {
     background: rgba(0, 0, 0, 0.08);
-    color: var(--accent-color);
+    color: var(--text-color);
 }
 
 #popup-ok {
     background: var(--accent-color);
     color: var(--text-background);
 }
+
+@keyframes popup {
+    0%   { transform: scale(0.8); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
 
 .speed-options {
     display: flex;
@@ -495,8 +529,8 @@ input[type="checkbox"].round-checkbox:checked {
     }
 }
 
-@media screen and (max-width: 768px){
-    #restart{
+@media screen and (max-width: 768px) {
+    #restart {
         display: none;
     }
 }

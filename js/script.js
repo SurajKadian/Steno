@@ -228,11 +228,14 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                     `<p>Get your own dictation, and paste the original matter below which will be used to calculate errors. </p>
                     <textarea id="custom-text" placeholder="Paste or type master text here..." 
                     style="width:100%; height:150px; padding:10px; border:1px solid var(--border-color); border-radius:6px; background: var(--background-color);"></textarea>
-                    <br>       
-                    <button id="up-btn" class="icons" onclick="document.getElementById('custom-file').click();">
-                    <img src="img/up.svg" class="svg" width="18" height="18"><span>Upload Text File</span>
+                    <br> <div class="speed-options">
+                    <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
+                    <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
                     <input type="file" id="custom-file" accept=".txt" style="display: none;">
-                    </button>`,
+                    </button>
+                    <button id="dh-btn" class="icons custom-btn" onclick="window.location.href='https://surajkadian.github.io/Dictation/'">
+                    <img src="img/mic.svg" class="svg"><span>Dictation Helper</span>
+                    </button></div>`,
                     () => {
                         const customText = document.getElementById("custom-text");
                         if (typeof text1 !== "undefined") {
@@ -242,24 +245,22 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                     }
                 );
 
-                setTimeout(() => {
-                    const fileInput = document.getElementById("custom-file");
-                    const customText = document.getElementById("custom-text");
+                const fileInput = document.getElementById("custom-file");
+                const customText = document.getElementById("custom-text");
 
-                    if (fileInput && customText) {
-                        fileInput.addEventListener('change', function (event) {
-                            const file = event.target.files[0];
-                            if (file) {
-                                const reader = new FileReader();
-                                reader.onload = function (e) {
-                                    const text = e.target.result;
-                                    customText.value = text;
-                                };
-                                reader.readAsText(file);
-                            }
-                        });
-                    }
-                }, 0);
+                if (fileInput && customText) {
+                    fileInput.addEventListener('change', function (event) {
+                        const file = event.target.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                const text = e.target.result;
+                                customText.value = text;
+                            };
+                            reader.readAsText(file);
+                        }
+                    });
+                }
 
             }
         }

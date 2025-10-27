@@ -225,9 +225,8 @@ document.querySelectorAll(".card-btn").forEach(btn => {
             } else {
                 showPopup(
                     "Custom Dictation",
-                    `<p>Get your own dictation, and paste the original matter below which will be used to calculate errors. </p>
-                    <textarea id="custom-text" placeholder="Paste or type master text here..." 
-                    style="width:100%; height:150px; padding:10px; border:1px solid var(--border-color); border-radius:6px; background: var(--background-color);"></textarea>
+                    `<p>Get your own dictation, and paste the dictated text below which will be used to calculate errors. </p>
+                    <textarea id="custom-text" placeholder="Paste or type master text here..." rows="10"></textarea>
                     <br> <div class="speed-options">
                     <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
                     <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
@@ -391,71 +390,107 @@ function lcs(text1, text2) {
 }
 
 submit.addEventListener('click', function () {
-    workspace.style.display = "none";
-    outputDiv.style.display = "block";
-    optionsScreen.style.display = "none";
-    document.querySelector("header").style.display = "none";
+    if (text1.value == "") {
+        showPopup(
+            "Master Text not found",
+            `<p>Paste the master text below which will be used to calculate errors. </p>
+            <textarea id="custom-text" placeholder="Paste or type master text here..." rows="10"></textarea>
+            <br> <div class="speed-options">
+            <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
+            <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
+            <input type="file" id="custom-file" accept=".txt" style="display: none;">
+            </button></div>`,
+            () => {
+                const customText = document.getElementById("custom-text");
+                if (typeof text1 !== "undefined") {
+                    text1.value = customText.value;
+                }
+                if (text1.value !== "") { submit.click(); }
+            }
+        );
+        const fileInput = document.getElementById("custom-file");
+        const customText = document.getElementById("custom-text");
 
-    const invisibleChar = '\u200B ';
-    let inputText1 = invisibleChar + text1.value;
-    let inputText2 = invisibleChar + text2.value;
-
-    const considerComma = document.getElementById('considerComma').checked;
-    const considerPeriod = document.getElementById('considerPeriod').checked;
-    const considerCase = document.getElementById('considerCase').checked;
-    const considerAllPunctuation = document.getElementById('considerAllPunctuation').checked;
-
-    if (considerAllPunctuation) {
-        inputText1 = inputText1.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
-        inputText2 = inputText2.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
+        if (fileInput && customText) {
+            fileInput.addEventListener('change', function (event) {
+                const file = event.target.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        const text = e.target.result;
+                        customText.value = text;
+                    };
+                    reader.readAsText(file);
+                }
+            });
+        }
     }
-    if (!considerComma) {
-        inputText1 = inputText1.replace(/,/g, '');
-        inputText2 = inputText2.replace(/,/g, '');
-    }
-    if (!considerPeriod) {
-        inputText1 = inputText1.replace(/\./g, '');
-        inputText2 = inputText2.replace(/\./g, '');
-    }
-    if (!considerCase) {
-        inputText1 = inputText1.toLowerCase();
-        inputText2 = inputText2.toLowerCase();
-    }
+    else {
+        workspace.style.display = "none";
+        outputDiv.style.display = "block";
+        optionsScreen.style.display = "none";
+        document.querySelector("header").style.display = "none";
 
-    var word1 = inputText1.trim().split(/\s+/);
-    var word2 = inputText2.trim().split(/\s+/);
-    var wordCount1 = word1.length;
-    var wordCount2 = word2.length;
-    var charCount1 = text1.value.length;
-    var charCount2 = text2.value.length;
-    var charWord1 = Math.round(charCount1 / 5);
-    var charWord2 = Math.round(charCount2 / 5);
-    var L = lcs(word2, word1);
-    var redWords = L.redWords.slice().reverse();
-    var blueWords = L.blueWords.slice().reverse();
-    var red = redWords.length;
-    var orangeWords = L.orangeWords.slice().reverse();
-    var orange = orangeWords.length;
-    var blue = blueWords.length;
-    var fm = red + orange;
-    var error = errorsPercentage(fm, blue, wordCount1);
-    var cp = "Disabled";
+        const invisibleChar = '\u200B ';
+        let inputText1 = invisibleChar + text1.value;
+        let inputText2 = invisibleChar + text2.value;
 
-    if (!submitButtonClicked && !autoClick) {
-        timeTotal = timeTotal - timeLeft;
-    }
+        const considerComma = document.getElementById('considerComma').checked;
+        const considerPeriod = document.getElementById('considerPeriod').checked;
+        const considerCase = document.getElementById('considerCase').checked;
+        const considerAllPunctuation = document.getElementById('considerAllPunctuation').checked;
 
-    if (wordCount2 > 1 && charCount2 > 1 && !copyPaste) {
-        var wpm = Math.round(wordCount2 / (timeTotal / 60));
-        var cpm = Math.round(charWord2 / (timeTotal / 60));
-    } else if (copyPaste) {
-        wpm = cpm = "NA";
-        cp = "Enabled";
-    } else {
-        wpm = cpm = "0"
-    }
+        if (considerAllPunctuation) {
+            inputText1 = inputText1.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
+            inputText2 = inputText2.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
+        }
+        if (!considerComma) {
+            inputText1 = inputText1.replace(/,/g, '');
+            inputText2 = inputText2.replace(/,/g, '');
+        }
+        if (!considerPeriod) {
+            inputText1 = inputText1.replace(/\./g, '');
+            inputText2 = inputText2.replace(/\./g, '');
+        }
+        if (!considerCase) {
+            inputText1 = inputText1.toLowerCase();
+            inputText2 = inputText2.toLowerCase();
+        }
 
-    document.querySelector('#result').innerHTML = `
+        var word1 = inputText1.trim().split(/\s+/);
+        var word2 = inputText2.trim().split(/\s+/);
+        var wordCount1 = word1.length;
+        var wordCount2 = word2.length;
+        var charCount1 = text1.value.length;
+        var charCount2 = text2.value.length;
+        var charWord1 = Math.round(charCount1 / 5);
+        var charWord2 = Math.round(charCount2 / 5);
+        var L = lcs(word2, word1);
+        var redWords = L.redWords.slice().reverse();
+        var blueWords = L.blueWords.slice().reverse();
+        var red = redWords.length;
+        var orangeWords = L.orangeWords.slice().reverse();
+        var orange = orangeWords.length;
+        var blue = blueWords.length;
+        var fm = red + orange;
+        var error = errorsPercentage(fm, blue, wordCount1);
+        var cp = "Disabled";
+
+        if (!submitButtonClicked && !autoClick) {
+            timeTotal = timeTotal - timeLeft;
+        }
+
+        if (wordCount2 > 1 && charCount2 > 1 && !copyPaste) {
+            var wpm = Math.round(wordCount2 / (timeTotal / 60));
+            var cpm = Math.round(charWord2 / (timeTotal / 60));
+        } else if (copyPaste) {
+            wpm = cpm = "NA";
+            cp = "Enabled";
+        } else {
+            wpm = cpm = "0"
+        }
+
+        document.querySelector('#result').innerHTML = `
             <div class="results-grid">
             <div class="result-card"><span>Typing Speed:</span><strong>${wpm} WPM (${cpm})</strong></div>
             <div class="result-card"><span>Error:</span><strong>${error}%</strong></div>
@@ -467,9 +502,10 @@ submit.addEventListener('click', function () {
             <div class="result-card"><span>Copy-Paste:</span><strong>${cp}</strong></div>
             </div>`;
 
-    // output
-    output.innerHTML = L.output + '<br>';
-    submitButtonClicked = true;
+        // output
+        output.innerHTML = L.output + '<br>';
+        submitButtonClicked = true;
+    }
 });
 
 const checkboxes = document.querySelectorAll('.checkbox-controls input[type="checkbox"]');
@@ -488,7 +524,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if ((event.ctrlKey || event.metaKey) && event.key === 's') {
             event.preventDefault();
-            document.getElementById('download-pdf').click()
+            printResults();
         }
     });
 });
@@ -522,4 +558,33 @@ const disableCopyPasteHandler = e => {
 ["paste", "copy", "cut"].forEach(evt => {
     text2.addEventListener(evt, disableCopyPasteHandler);
 });
+
+document.querySelector(".collapse-header").addEventListener("click", function () {
+    const content = document.querySelector(".collapse-content");
+    const isOpen = content.style.display === "block";
+
+    content.style.display = isOpen ? "none" : "block";
+    this.textContent = isOpen ? "Instructions ▼" : "Instructions ▲";
+});
+
+
+function printResults() {
+    const now = new Date();
+    const fileTitle =
+        "Steno" +
+        now.getFullYear() + "" +
+        String(now.getMonth() + 1).padStart(2, "0") +
+        String(now.getDate()).padStart(2, "0") +
+        String(now.getHours()).padStart(2, "0") +
+        String(now.getMinutes()).padStart(2, "0");
+
+    const originalTitle = document.title;
+    document.title = fileTitle;
+
+    window.print();
+
+    setTimeout(() => {
+        document.title = originalTitle;
+    }, 1000);
+}
 

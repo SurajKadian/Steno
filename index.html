@@ -138,13 +138,21 @@
                 <label><input type="checkbox" class="round-checkbox" id="considerCase" checked> Capitalisation</label>
             </div>
             <div class="checkbox-controls p-cards download-pdf-div">
-                <button id="download-pdf" class="icons output-btn" onclick="window.print()"
+                <button id="download-pdf" class="icons output-btn" onclick="printResults()"
                     alt="Download Results Button">
                     <img src="img/DL.svg" class="svg"><span>Save Results</span></button>
                 <button id="restart" class="icons output-btn" onclick="location.reload()" alt="Restart Button">
                     <img src="img/rs.svg" class="svg"><span>Restart</span></button>
             </div>
         </div>
+        <div class="output" style="user-select: none;">
+            <div class="collapse-header" style="cursor: pointer; font-weight: bold;">Instructions ▼</div>
+            <div class="collapse-content " style="display: none;">
+                <span class="red">Omitted</span>: These words were present in the master text but omitted in the typed text.<br>
+                <span class="red orange">Extra</span>: These words were not present in the master text.<br>
+                <span class="blue">Incorrect Spelling<span class="blue green">{Correct Spelling}</span></span>
+            </div>
+          </div>
         <div id="output" class="output"></div>
     </div>
     <div id="popup" class="popup-overlay" style="display:none;">

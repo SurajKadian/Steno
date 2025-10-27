@@ -354,6 +354,7 @@ input[type="checkbox"].round-checkbox:checked {
 }
 
 .output {
+    margin-bottom: 10px;
     border-radius: 16px;
     background-color: var(--text-background);
     color: var(--text-color);
@@ -452,17 +453,19 @@ input[type="checkbox"].round-checkbox:checked {
     padding: 4px 8px;
     border: 1px solid var(--border-color);
     border-radius: 16px;
-    background: var(--background-color);
+    background: var(--card);
     cursor: pointer;
     user-select: none;
     font-size: 14px;
 }
 
+.custom-btn:hover,
 .speed-btn:hover {
     background-color: var(--hover-color);
     border: 1px solid var(--accent-color);
 }
 
+.custom-btn:active,
 .speed-btn.active {
     background: var(--accent-color);
     color: var(--text-background);

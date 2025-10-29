@@ -45,7 +45,10 @@
     <!-- Top Bar -->
     <header>
         <div id="heading"><a href="https://t.me/surajkadian" target="_blank">Shorthand Practice</a></div>
-        <div id="timer">00:00</div>
+        <div id="timer"></div>
+        <img id="profile-icon" alt="Profile"
+            style="width:42px;height:42px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid var(--accent-color);">
+        </div>
     </header>
 
     <!-- Dictation Options -->
@@ -148,11 +151,12 @@
         <div class="output" style="user-select: none;">
             <div class="collapse-header" style="cursor: pointer; font-weight: bold;">Instructions ▼</div>
             <div class="collapse-content " style="display: none;">
-                <span class="red">Omitted</span>: These words were present in the master text but omitted in the typed text.<br>
+                <span class="red">Omitted</span>: These words were present in the master text but omitted in the typed
+                text.<br>
                 <span class="red orange">Extra</span>: These words were not present in the master text.<br>
                 <span class="blue">Incorrect Spelling<span class="blue green">{Correct Spelling}</span></span>
             </div>
-          </div>
+        </div>
         <div id="output" class="output"></div>
     </div>
     <div id="popup" class="popup-overlay" style="display:none;">
@@ -164,18 +168,23 @@
                         minutes</strong> to read. Then <strong>50 minutes</strong> will be given for transcription.</p>
             </div>
             <div class="popup-actions">
-                <button id="popup-close">Close</button>
-                <button id="popup-ok">OK</button>
+                <button id="popup-close">Cancel</button>
+                <button id="popup-ok">Continue</button>
             </div>
         </div>
     </div>
-
+<!--
+    <footer>
+        Crafted with simple intentions — curiosity over credentials. © SurajKadian
+    </footer>
+-->
     <script>if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {
                 navigator.serviceWorker.register('js/service-worker.js');
             });
         }
     </script>
+    <script src="js/db.js"></script>
     <script src="js/script.js"></script>
     <script src="js/service-worker.js"></script>
 </body>

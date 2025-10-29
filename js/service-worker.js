@@ -1,39 +1,54 @@
 // Service Worker
 
-self.addEventListener('install', function (event) {
-    event.waitUntil(
-        caches.open('steno-cache').then(function (cache) {
-            return cache.addAll([
-                '/index.html',
-                '/style.css',
-                '/js/script.js',
-                '/text',
-                '/manifest.json',
-                '/js/service-worker.js',
-                '/img'
-            ]);
-        })
-    );
+const CACHE_NAME = 'steno-cache-v2';
+const FILES_TO_CACHE = [
+  '/index.html',
+  '/style.css',
+  '/js/script.js',
+  '/js/db.js',
+  '/js/service-worker.js',
+  '/manifest.json',
+  '/img/surajkadian.jpg'
+];
+
+// INSTALL
+self.addEventListener('install', event => {
+  event.waitUntil(
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(FILES_TO_CACHE);
+    })
+  );
+  self.skipWaiting();
 });
 
-self.addEventListener('activate', function (event) {
-    console.log('Service worker activated');
-
-    const CACHE_PREFIX = 'steno-cache-';
-
-    event.waitUntil(
-        caches.keys().then(function (cacheNames) {
-            return Promise.all(
-                cacheNames.filter(function (cacheName) {
-                    return cacheName.startsWith(CACHE_PREFIX) && cacheName !== currentCacheName;
-                }).map(function (cacheName) {
-                    return caches.delete(cacheName);
-                })
-            );
+// ACTIVATE
+self.addEventListener('activate', event => {
+  console.log('Service worker activated');
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(cacheName => {
+          if (cacheName !== CACHE_NAME) {
+            console.log('Deleting old cache:', cacheName);
+            return caches.delete(cacheName);
+          }
         })
-    );
+      );
+    })
+  );
+  self.clients.claim();
 });
 
-self.addEventListener('fetch', function (event) {
-    console.log('Fetch event', event);
+// FETCH
+self.addEventListener('fetch', event => {
+  event.respondWith(
+    caches.match(event.request).then(response => {
+      if (response) return response;
+      return fetch(event.request).catch(() => {
+        if (event.request.destination === 'image') {
+          return caches.match('/img/surajkadian.jpg');
+        }
+      });
+    })
+  );
 });

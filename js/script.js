@@ -40,6 +40,16 @@ function showPopup(title, bodyHTML, onOk) {
     });
 }
 
+popup.addEventListener("click", e => {
+    if (e.target === popup) {
+        popup.style.display = 'none';
+    }
+});
+
+popupClose.addEventListener("click", () => {
+    popup.style.display = "none";
+});
+
 document.querySelectorAll(".group-toggle").forEach(toggle => {
     toggle.addEventListener("click", (e) => {
         const el = e.currentTarget;
@@ -271,11 +281,6 @@ document.querySelectorAll(".card-btn").forEach(btn => {
     });
 });
 
-popupClose.addEventListener("click", () => {
-    popup.style.display = "none";
-});
-
-
 function errorsPercentage(fullMistakes, halfMistakes, totalWords) {
     if (!isNaN(fullMistakes) && !isNaN(halfMistakes) && !isNaN(totalWords)) {
         var errorsPercentage = ((fullMistakes + (halfMistakes / 2)) / totalWords) * 100;
@@ -406,11 +411,7 @@ submit.addEventListener('click', function () {
             <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
             <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
             <input type="file" id="custom-file" accept=".txt" style="display: none;">
-            </button></div>
-            
-            <div class="checkbox-controls p-cards capital-div">
-                <label><input type="checkbox" class="round-checkbox" id="considerCase" checked> Capitalisation</label>
-            </div>`,
+            </button></div>`,
             () => {
                 const customText = document.getElementById("custom-text");
                 if (typeof text1 !== "undefined") {
@@ -456,17 +457,17 @@ submit.addEventListener('click', function () {
         const considerCase = document.getElementById('considerCase').checked;
         const considerAllPunctuation = document.getElementById('considerAllPunctuation').checked;
 
-        if (considerAllPunctuation) {
-            inputText1 = inputText1.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
-            inputText2 = inputText2.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, '');
+        if (!considerAllPunctuation) {
+            inputText1 = inputText1.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, ' ');
+            inputText2 = inputText2.replace(/[!"#$%&'()*+\-/:;<=>?@[\\\]^_`{|}~]/g, ' ');
         }
         if (!considerComma) {
-            inputText1 = inputText1.replace(/,/g, '');
-            inputText2 = inputText2.replace(/,/g, '');
+            inputText1 = inputText1.replace(/,/g, ' ');
+            inputText2 = inputText2.replace(/,/g, ' ');
         }
         if (!considerPeriod) {
-            inputText1 = inputText1.replace(/\./g, '');
-            inputText2 = inputText2.replace(/\./g, '');
+            inputText1 = inputText1.replace(/\./g, ' ');
+            inputText2 = inputText2.replace(/\./g, ' ');
         }
         if (!considerCase) {
             inputText1 = inputText1.toLowerCase();
@@ -518,9 +519,40 @@ submit.addEventListener('click', function () {
             <div class="result-card"><span>Copy-Paste:</span><strong>${cp}</strong></div>
             </div>`;
 
+        // ================== Save result to local storage (via StenoDB) ==================
+        try {
+            if (window.StenoDB && typeof window.StenoDB.saveResult === 'function') {
+                const userId = (StenoDB.getUserProfile && StenoDB.getUserProfile().id) || null;
+                const resultToSave = {
+                    id: 'result-' + Date.now(),
+                    userId: userId,
+                    date: new Date().toISOString(),
+                    wpm: wpm === undefined ? null : wpm,
+                    errorRate: error === undefined ? null : error,
+                    fullMistakes: fm === undefined ? null : fm,
+                    halfMistakes: blue === undefined ? null : blue,
+                    totalWords: wordCount1 === undefined ? null : wordCount1,
+                    wordsTyped: wordCount2 === undefined ? null : wordCount2,
+                    timeTaken: timeTotal === undefined ? null : timeTotal,
+                    copyPaste: copyPaste ? true : false,
+                    dictationId: (typeof text1 !== 'undefined' && text1 && text1.name) ? text1.name : null
+                };
+                StenoDB.saveResult(resultToSave);
+                // optional: console feedback
+                console.log('Saved result to localStorage', resultToSave);
+            } else {
+                console.warn('StenoDB not available — result not saved.');
+            }
+        } catch (e) {
+            console.error('Error saving result to localStorage', e);
+        }
+        // =======================================================================
+
+
         // output
         output.innerHTML = L.output + '<br>';
         submitButtonClicked = true;
+        clearInterval(countdownInterval);
     }
 });
 
@@ -529,19 +561,6 @@ checkboxes.forEach(checkbox => {
     checkbox.addEventListener('change', () => {
         submit.click();
         clearInterval(countdownInterval);
-    });
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    document.addEventListener('keydown', function (event) {
-        if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
-            event.preventDefault();
-            restart.click()
-        }
-        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
-            event.preventDefault();
-            printResults();
-        }
     });
 });
 
@@ -607,6 +626,117 @@ function printResults() {
 function cleanMasterText(rawText) {
     let cleaned = rawText.replace(/\//g, ' ');
     cleaned = cleaned.replace(/\(\s*\d+\s*\)/g, ' ');
+    cleaned = cleaned.replace(/\b[A-Z]{2,}\b/g, match => match.toLowerCase());
     cleaned = cleaned.replace(/\s+/g, ' ').trim();
     return cleaned;
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('keydown', function (event) {
+        if ((event.ctrlKey || event.metaKey) && event.key === 'r') {
+            event.preventDefault();
+            restart.click()
+        }
+        if ((event.ctrlKey || event.metaKey) && event.key === 's') {
+            event.preventDefault();
+            printResults();
+        }
+    });
+    const profileIcon = document.getElementById('profile-icon');
+    profileIcon.src = StenoDB.getUserProfile().photo;
+    if (profileIcon) {
+        profileIcon.addEventListener('click', () => {
+            if (!window.StenoDB) return;
+
+            const profile = StenoDB.getUserProfile();
+            const statsHTML = StenoDB.renderProgressHTML
+                ? StenoDB.renderProgressHTML()
+                : '<p>No stats available</p>';
+
+            // Profile header
+            document.getElementById('popup-title').innerHTML = `
+            <div style="display:flex;align-items:center;gap:12px;">
+            <img id="profile-photo" src="${profile.photo}" 
+                style="width:60px;height:60px;border-radius:50%;object-fit:cover;border:2px solid var(--accent-color);">
+            <div>
+            <div id="profile-name" style="font-weight:600;font-size:18px;">${profile.name}</div>
+            <button id="edit-profile-btn" 
+                    style="margin-top:4px;font-size:12px;border:1px solid var(--accent-color);background:none;border-radius:6px;padding:2px 6px;color:var(--accent-color);cursor:pointer;">Edit Profile</button>
+            </div></div>`;
+
+            // Stats content
+            document.getElementById('popup-body').innerHTML = `<div id="stats-container">${statsHTML}</div>`;
+
+
+            document.getElementById('popup').style.display = 'flex';
+            popupOk.addEventListener('click', () => {
+                document.getElementById('popup').style.display = 'none';
+            });
+
+            const editBtn = document.getElementById('edit-profile-btn');
+            if (editBtn) {
+                editBtn.addEventListener('click', () => {
+                    document.getElementById('popup-title').innerHTML = `
+              <div style="display:flex;flex-direction:column;align-items:center;text-align:center;">
+                <img id="edit-photo-preview" src="${profile.photo}" 
+                     style="width:80px;height:80px;border-radius:50%;object-fit:cover;border:2px solid var(--accent-color);margin-bottom:10px;">
+                <input type="file" id="edit-photo-input" accept="image/*" style="margin-bottom:10px;">
+                <input type="text" id="edit-name-input" value="${profile.name}" 
+                       placeholder="Enter your name" 
+                       style="padding:6px 10px;border:1px solid var(--accent-color);border-radius:6px;width:80%;max-width:240px;">
+              </div>
+            `;
+                    const table = document.querySelector('#stats-container table');
+                    if (!table) return;
+
+                    const editing = table.dataset.editing === "true";
+                    table.dataset.editing = editing ? "false" : "true";
+
+                    if (!editing) {
+                        table.querySelectorAll('tbody tr').forEach((row, i) => {
+                            const id = (StenoDB.readAllResults().slice().reverse()[i] || {}).id;
+                            if (!id) return;
+                            const delBtn = document.createElement('button');
+                            delBtn.textContent = '✕';
+                            delBtn.style.cssText = 'margin-left:8px;color:#fff;background:#b22222;border:none;border-radius:4px;cursor:pointer;padding:2px 6px;';
+                            delBtn.addEventListener('click', () => {
+                                if (confirm('Delete this record?')) {
+                                    StenoDB.deleteResultById(id);
+                                    row.remove();
+                                }
+                            });
+                            const lastCell = row.lastElementChild;
+                            lastCell.appendChild(delBtn);
+                        });
+                    } else {
+                        document.getElementById('stats-container').innerHTML = StenoDB.renderProgressHTML();
+                    }
+
+                    popupOk.addEventListener('click', () => {
+
+                        const nameInput = document.getElementById('edit-name-input');
+                        const fileInput = document.getElementById('edit-photo-input');
+                        const newName = nameInput.value.trim() || profile.name;
+
+                        let updates = { name: newName };
+                        console.log(updates);
+                        profileIcon.click();
+
+                        const file = fileInput.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = ev => {
+                                updates.photo = ev.target.result;
+                                StenoDB.updateUserProfile(updates);
+                                profileIcon.src = updates.photo;
+                            };
+                            reader.readAsDataURL(file);
+                        } else {
+                            StenoDB.updateUserProfile(updates);
+                        }
+                    });
+                });
+            }
+        });
+    }
+});

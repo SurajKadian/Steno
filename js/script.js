@@ -151,7 +151,7 @@ document.querySelectorAll(".card-btn").forEach(btn => {
 
                 showPopup(
                     "Instructions", `
-                <p>Now the dictation audio will play </p>
+                <p>The dictation audio will play next</p>
                 <p>After the dictation finishes, you will get <strong>10 minutes</strong> to read your outlines.</p>
                 <p>Then you will get <strong>50 minutes</strong> to transcribe.</p>
                 <p>Select speed for dictation (in <b>WPM</b>): </p>
@@ -226,8 +226,9 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                 showPopup(
                     "Custom Dictation",
                     `<p>Get your own dictation, and paste the dictated text below which will be used to calculate errors. </p>
-                    <textarea id="custom-text" placeholder="Paste or type master text here..." rows="10"></textarea>
-                    <br> <div class="speed-options">
+                    <textarea id="custom-text" placeholder="Paste or type master text here..." rows="10"></textarea><br>
+                    <div class="speed-options"><button id="clean" class="speed-btn">Clean Master Text</button></div>
+                    <div class="speed-options">
                     <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
                     <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
                     <input type="file" id="custom-file" accept=".txt" style="display: none;">
@@ -238,7 +239,7 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                     () => {
                         const customText = document.getElementById("custom-text");
                         if (typeof text1 !== "undefined") {
-                            text1.value = customText.value;
+                            text1.value = cleanMasterText(customText.value);
                         }
                         startReadingStage();
                     }
@@ -247,6 +248,10 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                 const fileInput = document.getElementById("custom-file");
                 const customText = document.getElementById("custom-text");
 
+                document.getElementById('clean').addEventListener('click', function () {
+                    if (customText) customText.value = cleanMasterText(customText.value);
+                });
+
                 if (fileInput && customText) {
                     fileInput.addEventListener('change', function (event) {
                         const file = event.target.files[0];
@@ -254,7 +259,7 @@ document.querySelectorAll(".card-btn").forEach(btn => {
                             const reader = new FileReader();
                             reader.onload = function (e) {
                                 const text = e.target.result;
-                                customText.value = text;
+                                customText.value = cleanMasterText(text);
                             };
                             reader.readAsText(file);
                         }
@@ -395,21 +400,32 @@ submit.addEventListener('click', function () {
             "Master Text not found",
             `<p>Paste the master text below which will be used to calculate errors. </p>
             <textarea id="custom-text" placeholder="Paste or type master text here..." rows="10"></textarea>
-            <br> <div class="speed-options">
+            <br>
+            <div class="speed-options"><button id="clean" class="speed-btn">Clean Master Text</button></div> 
+            <div class="speed-options">
             <button id="up-btn" class="icons custom-btn" onclick="document.getElementById('custom-file').click();">
             <img src="img/up.svg" class="svg" ><span>Upload Text File</span>
             <input type="file" id="custom-file" accept=".txt" style="display: none;">
-            </button></div>`,
+            </button></div>
+            
+            <div class="checkbox-controls p-cards capital-div">
+                <label><input type="checkbox" class="round-checkbox" id="considerCase" checked> Capitalisation</label>
+            </div>`,
             () => {
                 const customText = document.getElementById("custom-text");
                 if (typeof text1 !== "undefined") {
-                    text1.value = customText.value;
+                    text1.value = cleanMasterText(customText.value);
                 }
                 if (text1.value !== "") { submit.click(); }
             }
         );
         const fileInput = document.getElementById("custom-file");
         const customText = document.getElementById("custom-text");
+
+
+        document.getElementById('clean').addEventListener('click', function () {
+            if (customText) customText.value = cleanMasterText(customText.value);
+        });
 
         if (fileInput && customText) {
             fileInput.addEventListener('change', function (event) {
@@ -418,7 +434,7 @@ submit.addEventListener('click', function () {
                     const reader = new FileReader();
                     reader.onload = function (e) {
                         const text = e.target.result;
-                        customText.value = text;
+                        customText.value = cleanMasterText(text);
                     };
                     reader.readAsText(file);
                 }
@@ -588,3 +604,9 @@ function printResults() {
     }, 1000);
 }
 
+function cleanMasterText(rawText) {
+    let cleaned = rawText.replace(/\//g, ' ');
+    cleaned = cleaned.replace(/\(\s*\d+\s*\)/g, ' ');
+    cleaned = cleaned.replace(/\s+/g, ' ').trim();
+    return cleaned;
+}

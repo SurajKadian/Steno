@@ -10,7 +10,7 @@ var output = document.getElementById("output");
 const timer = document.getElementById('timer');
 let timeTotal = 3000;
 let timeLeft = timeTotal;
-let hm = 70;
+let hm = 55;
 
 const optionsScreen = document.getElementById("options-screen");
 const workspace = document.getElementById("workspace");

@@ -10,7 +10,7 @@ var output = document.getElementById("output");
 const timer = document.getElementById('timer');
 let timeTotal = 3000;
 let timeLeft = timeTotal;
-let hm = 30;
+let hm = 3;
 
 const optionsScreen = document.getElementById("options-screen");
 const workspace = document.getElementById("workspace");
@@ -311,12 +311,9 @@ function ld(word1, word2) {
     }
 
     var distance = dp[m][n];
-    var maxLength = Math.max(m, n);
-    var similarityPercentage = ((maxLength - distance) / maxLength) * 100;
-
+    
     return {
-        distance: distance,
-        similarityPercentage: similarityPercentage
+        distance: distance
     };
 }
 
@@ -347,8 +344,8 @@ function lcs(text1, text2) {
 
         if (text1[i - 1] === text2[j - 1]) {
             dp[i][j] = 1 + lcsLength(i - 1, j - 1);
-        } else if (ld(text1[i - 1], text2[j - 1]).similarityPercentage >= hm
-            && ld(text1[i - 1], text2[j - 1]).similarityPercentage < 100) {
+        } else if (ld(text1[i - 1], text2[j - 1]).distance >= 1
+            && ld(text1[i - 1], text2[j - 1]).distance < hm) {
             dp[i][j] = 0.5 + lcsLength(i - 1, j - 1);
         } else {
             dp[i][j] = Math.max(lcsLength(i - 1, j), lcsLength(i, j - 1));
@@ -369,8 +366,8 @@ function lcs(text1, text2) {
         } else if (text1[i - 1] === text2[j - 1]) {
             return constructLCS(i - 1, j - 1)
                 + '<span>' + text1[i - 1] + '</span> ';
-        } else if (ld(text1[i - 1], text2[j - 1]).similarityPercentage >= hm
-            && ld(text1[i - 1], text2[j - 1]).similarityPercentage < 100) {
+        } else if (ld(text1[i - 1], text2[j - 1]).distance >= 1
+            && ld(text1[i - 1], text2[j - 1]).distance < hm) {
             blueWords.push('<span class="blue">' + text1[i - 1]
                 + '<span class="green">{' + text2[j - 1] + '}</span></span>');
             return constructLCS(i - 1, j - 1)
